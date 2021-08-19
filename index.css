@@ -1,7 +1,5 @@
 html,
 body {
-    max-width: 650px;
-    margin: auto;
 	background-image: none !important;
 	background-color: rgba(40, 42, 54, 1) !important;
 }
@@ -9,6 +7,11 @@ body {
 body * {
 	color: rgba(248, 248, 242, 1) !important;
 	background-color: rgba(40, 42, 54, 1) !important;
+}
+
+.center {
+    max-width: 650px;
+    margin: auto;
 }
 
 .levi {
