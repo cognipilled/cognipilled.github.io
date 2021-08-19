@@ -1,4 +1,6 @@
 # LeviFinkelstein.github.io
-qwer
-qwer
-qwer
+
+```sh
+#!/bin/sh
+pandoc $1.tex -s --mathjax -o index.html -H ../../head.html
+```
