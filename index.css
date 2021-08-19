@@ -23,6 +23,7 @@ a * {
     font-size: 20px;
 	color: rgba(80, 250, 123, 1) !important;
 	background-color: transparent !important;
+    text-decoration: none;
 }
 
 a:hover,
@@ -39,6 +40,7 @@ div[onclick]:hover,
 .link:hover,
 .link:hover * {
 	color: rgba(241, 250, 140, 1) !important;
+    text-decoration: underline; 
 }
 
 a:visited,
