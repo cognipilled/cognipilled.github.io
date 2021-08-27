@@ -9,7 +9,7 @@ I was reading about this trick used for proving that a greedy algorithm is optim
 \\\\
 Reading about this trick reminded my of the reason for why Evil will always win over Good: \textbf{anything a Good agent does an Evil agent can do, but not vice versa}.
 \\\\
-If $U$ is the set of all actions and $E\in U$ is the set of Evil actions, then the Evil agent has the advantage of being able to search through all of $U$ for actions, while the Good agent is constrained to the smaller subset $U/E\in U$. Unless all optimal action is always in $U/E$, the Evil agent will strictly outcompete the Good agent, otherwise they will be even.
+If $U$ is the set of all actions and $E\subset U$ is the set of Evil actions, then the Evil agent has the advantage of being able to search through all of $U$ for actions, while the Good agent is constrained to the smaller subset $U/E\subset U$. Unless all optimal action is always in $U/E$, the Evil agent will strictly outcompete the Good agent, otherwise they will be even.
 \\\\
 Mr. Nice cannot act optimally relative to Mr. Mean since where Mr. Nice wouldn't torture someone for his goal, Mr. Mean would. Mr. Mean is solving a relaxed version Mr. Nice's problem, and Mr. Nice is solving a constrained version of Mr. Mean's problem.
 \\\\
