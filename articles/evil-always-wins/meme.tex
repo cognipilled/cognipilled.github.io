@@ -6,18 +6,15 @@
 \maketitle
 
 I was reading about this trick used for proving that a greedy algorithm is optimal called "greedy exchange". It works by showing that any solution produced by an optimal algorithm can be morphed into the solution produced by your greedy algorithm without destroying its optimality.
-\\\\
+\par
 Reading about this trick reminded my of the reason for why Evil will always win over Good: \textbf{anything a Good agent does an Evil agent can do, but not vice versa}.
-\\\\
+\par
 If $U$ is the set of all actions and $E\subset U$ is the set of Evil actions, then the Evil agent has the advantage of being able to search through all of $U$ for actions, while the Good agent is constrained to the smaller subset $U/E\subset U$. Unless all optimal action is always in $U/E$, the Evil agent will strictly outcompete the Good agent, otherwise they will be even.
-\\\\
+\par
 Mr. Nice cannot act optimally relative to Mr. Mean since where Mr. Nice wouldn't torture someone for his goal, Mr. Mean would. Mr. Mean is solving a relaxed version Mr. Nice's problem, and Mr. Nice is solving a constrained version of Mr. Mean's problem.
-\\\\
+\par
 In some sense this doesn't matter at all. If Mr. Nice and Mr. Mean are just two agents with each their own objective function, one Good and one Evil, what does it mean to say that the one is more constrained than the other, aren't they both just optimizing action for their objective functions? I think yes. The sense in which this principle applies is if you think of Evil in a deontological way where you imagine superimposing deontological rules like "don't lie" onto the space through which you're searching for actions. In other words, deontology works as a constraint on your attempts at maximizing your objective function. Which is in my eyes the reason why deontology is stupid. If I have a deontological rule that says I can't do $X$, then I can just always be faced with the scenario of \textit{"all sentient life being tortured for all eternity unless I do $X$"} and I would be fucked.
-\\\\
+\par
 So who cares if Evil wins if "Evil" just means not alligning with some stupid deontology nonsense? Under this notion of Evil I don't see a reason for why we should care, but there is another sense in which it matters. This is the \href{https://slatestarcodex.com/2014/07/30/meditations-on-moloch/}{Molochean} sense where optimzing for optimizing will always outcompete optimizing for Good. The survival of the fittest sense where what's good at surviving survives and what's good at doing Good just dies because the universe isn't set up with a bias towards making Good things propagate. In this sense Evil also wins out ... on average ... so let's hope we end up as some statistical anomaly.
-
-
-%TODO continue about how that deontology nonsese makes it so peole who maximize power will outcompete people who maximize Good which is only partly overlapping with power. Objective function of power. If you only search for power you can spend time feeling good. Myopic dystopia. that moloch thing
 
 \end{document}

@@ -9,13 +9,22 @@ body {
 }
 
 .levi {
-    text-shadow: 0px 0px 10px gray;;
+    text-decoration: underline;
     font-family: monospace;
 }
 
-a {
+.article-list a {
     font-size: 20px;
     text-decoration: none;
+}
+a {
+    text-decoration: none;
+}
+p a {
+    color: slateblue !important;
+}
+p a:visited {
+    color: purple !important;
 }
 a:hover{
     text-decoration: underline;
@@ -25,4 +34,3 @@ h4 {
     margin-bottom:0;
     margin-top: 40px;
 }
-
