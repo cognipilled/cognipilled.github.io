@@ -16,6 +16,7 @@ body {
 .article-list a {
     font-size: 20px;
     text-decoration: none;
+    color: inherit;
 }
 a {
     text-decoration: none;
@@ -38,6 +39,8 @@ h4 {
 .article-list {
     list-style: none;
     padding: 0;
+    width: 100%;
+    max-width: 600px;
 }
 
 .article-list li {
@@ -56,4 +59,89 @@ h4 {
 
 .article-list a:hover {
     color: #666;
+}
+
+.post-row {
+    position: relative;
+    padding: 10px 0;
+}
+
+.post-date {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.post-container {
+    width: 100%;
+    max-width: 600px; /* adjust as needed */
+}
+
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    background-color: #f1f1f1;
+    padding-top: 60px;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.sidebar-toggle {
+    font-size: 24px;
+    cursor: pointer;
+    background-color: transparent;
+    color: black;
+    padding: 10px 15px;
+    border: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+
+/* Adjust main content when sidebar is open */
+.h-center {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: margin-left .5s;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.arithmetic-game-link {
+    color: slateblue;
+    font-weight: bold;
 }

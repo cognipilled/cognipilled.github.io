@@ -6,13 +6,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="./index.css">
     </head>
-    <body class="center">
-        <div class="h-center">
-            <h1>Welcome to Abunga</span> </h1>
-        <h2>Posts:</h2>
-        <ul class="article-list">
-            <li><a href="./articles/welcome.html">Welcome</a></li>
-        </ul>
+    <body>
+        <div class="sidebar" id="mySidebar" style="background-color: #f1f1f1;">
+            <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()">&times;</a>
+            <a href="https://www.admonymous.co/hmys">Give Me Anonymous Feedback</a>
+            <a href="https://x.com/__HMYS__">Twitter</a>
+            <a href="https://hmys-b.github.io/" class="arithmetic-game-link">Arithmetic Game</a>
+            <a href="./webapps/kelly_game.html">Kelly Game</a>
         </div>
+
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+        <div class="main-content">
+            <div class="h-center">
+                <h1>Welcome to Abunga</h1>
+                <h2>Posts:</h2>
+                <div class="post-container">
+                    <hr>
+                    <div class="post-row">
+                        <a href="./articles/welcome.html">Welcome</a>
+                        <span class="post-date">2024-10-31</span>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleSidebar() {
+                document.getElementById("mySidebar").classList.toggle("active");
+            }
+        </script>
     </body>
 </html>
