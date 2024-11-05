@@ -6,55 +6,130 @@
     <title>Kelly Criterion Game</title>
     <link rel="stylesheet" href="../../index.css">
     <link rel="stylesheet" href="kelly.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="h-center">
+    <div class="h-center" style="text-align: center;">
         <h1>Kelly Criterion Game</h1>
         <div class="kelly-container">
             <div class="kelly-input">
                 <p>Market Price: <span id="marketPrice">0.5</span></p>
                 <p>True Probability: <span id="probability">0.6</span></p>
+                <p>Rounds Remaining: <span id="roundsLeft">200</span></p>
             </div>
             <div class="kelly-input">
+                <label for="roundsInput">Number of Rounds:</label>
+                <input type="number" id="roundsInput" min="1" value="200">
+                <button class="kelly-button" onclick="startGame()">Start Game</button>
+            </div>
+            <div class="kelly-input" id="betControls" style="display: none;">
                 <label for="betAmount">How much money do you want to bet? ($)</label>
                 <input type="number" id="betAmount" min="0" step="0.01" value="0">
+                <button class="kelly-button" onclick="placeBet()">Place Bet</button>
+                <button class="kelly-button" onclick="skipBet()">Skip</button>
             </div>
-            <div class="kelly-input">
-                <p>Optimal Kelly Bet: $<span id="optimalBet">0</span></p>
-            </div>
-            <button class="kelly-button" onclick="placeBet()">Place Bet</button>
-            <button class="kelly-button" onclick="skipBet()">Skip Bet</button>
             <div id="results">
                 <p>Current Bankroll: $<span id="currentBankroll">1000</span></p>
                 <p>Number of Bets: <span id="betCount">0</span></p>
             </div>
         </div>
+        <div class="chart-container" style="width: 800px; height: 400px;">
+            <canvas id="performanceChart"></canvas>
+        </div>
     </div>
 
     <script>
         let bankroll = 1000;
+        let optimalBankroll = 1000;
         let betCount = 0;
         let currentPrice, currentProbability;
+        let roundsLeft = 200;
+        let performanceChart;
+        let performanceData = {
+            actual: [1000],
+            optimal: [1000]
+        };
+        let gameStarted = false;
 
-        function generateNewBet() {
-            // Generate random market price and true probability
-            currentPrice = Math.random().toFixed(2);
-            currentProbability = (Math.random() * 0.5 + 0.3).toFixed(2); // Between 0.3 and 0.8
+        function startGame() {
+            if (gameStarted) return;
             
-            document.getElementById('marketPrice').textContent = currentPrice;
-            document.getElementById('probability').textContent = currentProbability;
-            calculateKelly();
+            roundsLeft = parseInt(document.getElementById('roundsInput').value);
+            if (roundsLeft < 1) {
+                alert("Please enter a valid number of rounds (minimum 1)");
+                return;
+            }
+            
+            gameStarted = true;
+            document.getElementById('roundsLeft').textContent = roundsLeft;
+            document.getElementById('betControls').style.display = 'block';
+            document.getElementById('roundsInput').disabled = true;
+            
+            initializeChart();
+            generateNewBet();
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0'],
+                    datasets: [{
+                        label: 'Your Portfolio (log10 scale)',
+                        data: [Math.log10(1000)],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Optimal Kelly Portfolio (log10 scale)',
+                        data: [Math.log10(1000)],
+                        borderColor: 'rgb(192, 75, 75)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Log10 Portfolio Value'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            performanceChart.data.labels.push(betCount.toString());
+            performanceChart.data.datasets[0].data.push(Math.log10(bankroll));
+            performanceChart.data.datasets[1].data.push(Math.log10(optimalBankroll));
+            performanceChart.update();
         }
 
         function calculateKelly() {
             const p = parseFloat(currentProbability);
-            const price = parseFloat(currentPrice);
-            const returns = 1/price - 1; // Correct return calculation
-            const kellyAmount = Math.max(0, bankroll * (p - (1-p)/returns));
-            document.getElementById('optimalBet').textContent = kellyAmount.toFixed(2);
+            const r = parseFloat(currentPrice);
+            const expectedValue = p * (1/r - 1) - (1-p);
+            
+            // Only bet if expected value is positive
+            if (expectedValue <= 0) {
+                return 0;
+            }
+            
+            // Kelly fraction formula: f = p - (1-p)/(1/r - 1)
+            const kellyFraction = p - (1-p)/(1/r - 1);
+            return optimalBankroll * Math.max(0, kellyFraction);
         }
 
         function placeBet() {
+            if (roundsLeft <= 0) {
+                alert("Game Over! Refresh to start a new game.");
+                return;
+            }
+
             const betSize = parseFloat(document.getElementById('betAmount').value);
             if (betSize > bankroll) {
                 alert("You can't bet more than your bankroll!");
@@ -62,24 +137,58 @@
             }
             
             const win = Math.random() < currentProbability;
+            const kellyBetSize = calculateKelly();
             
+            // Update actual bankroll
             if (win) {
                 bankroll += betSize * (1/currentPrice - 1);
+                optimalBankroll += kellyBetSize * (1/currentPrice - 1);
             } else {
                 bankroll -= betSize;
+                optimalBankroll -= kellyBetSize;
             }
 
             betCount++;
+            roundsLeft--;
+            
             document.getElementById('currentBankroll').textContent = bankroll.toFixed(2);
             document.getElementById('betCount').textContent = betCount;
-            generateNewBet();
+            document.getElementById('roundsLeft').textContent = roundsLeft;
+            
+            updateChart();
+            
+            if (roundsLeft > 0) {
+                generateNewBet();
+            }
         }
 
         function skipBet() {
+            if (roundsLeft <= 0) {
+                alert("Game Over! Refresh to start a new game.");
+                return;
+            }
+            betCount++;
+            roundsLeft--;
+            document.getElementById('roundsLeft').textContent = roundsLeft;
+            updateChart();
             generateNewBet();
         }
 
-        // Initialize first bet
+        function generateNewBet() {
+            // Generate new market price between 0.1 and 0.9
+            currentPrice = (Math.random() * 0.8 + 0.1).toFixed(2);
+            // Generate true probability slightly different from market price
+            currentProbability = (parseFloat(currentPrice) + (Math.random() - 0.5) * 0.2).toFixed(2);
+            
+            // Ensure probability stays between 0 and 1
+            currentProbability = Math.min(Math.max(currentProbability, 0), 1);
+            
+            document.getElementById('marketPrice').textContent = currentPrice;
+            document.getElementById('probability').textContent = currentProbability;
+        }
+
+        // Initialize game
+        initializeChart();
         generateNewBet();
     </script>
 </body>
