@@ -12,21 +12,18 @@
         <h1>Kelly Criterion Game</h1>
         <div class="kelly-container">
             <div class="kelly-input">
-                <label for="marketPrice">Market Price (0-1)</label>
-                <input type="number" id="marketPrice" min="0" max="1" step="0.01" value="0.5">
+                <p>Market Price: <span id="marketPrice">0.5</span></p>
+                <p>True Probability: <span id="probability">0.6</span></p>
             </div>
             <div class="kelly-input">
-                <label for="probability">True Probability of Winning (0-1)</label>
-                <input type="number" id="probability" min="0" max="1" step="0.01" value="0.6">
+                <label for="betAmount">How much money do you want to bet? ($)</label>
+                <input type="number" id="betAmount" min="0" step="0.01" value="0">
             </div>
             <div class="kelly-input">
-                <label for="betAmount">What percentage of your bankroll do you want to bet? (0-100%)</label>
-                <input type="number" id="betAmount" min="0" max="100" value="0">
-            </div>
-            <div class="kelly-input">
-                <p>Optimal Kelly Bet: <span id="optimalBet">0</span>%</p>
+                <p>Optimal Kelly Bet: $<span id="optimalBet">0</span></p>
             </div>
             <button class="kelly-button" onclick="placeBet()">Place Bet</button>
+            <button class="kelly-button" onclick="skipBet()">Skip Bet</button>
             <div id="results">
                 <p>Current Bankroll: $<span id="currentBankroll">1000</span></p>
                 <p>Number of Bets: <span id="betCount">0</span></p>
@@ -37,36 +34,53 @@
     <script>
         let bankroll = 1000;
         let betCount = 0;
+        let currentPrice, currentProbability;
+
+        function generateNewBet() {
+            // Generate random market price and true probability
+            currentPrice = Math.random().toFixed(2);
+            currentProbability = (Math.random() * 0.5 + 0.3).toFixed(2); // Between 0.3 and 0.8
+            
+            document.getElementById('marketPrice').textContent = currentPrice;
+            document.getElementById('probability').textContent = currentProbability;
+            calculateKelly();
+        }
 
         function calculateKelly() {
-            const p = parseFloat(document.getElementById('probability').value);
-            const price = parseFloat(document.getElementById('marketPrice').value);
-            const b = (1 - price) / price; // Convert price to odds
-            const q = 1 - p;
-            const kellyPercentage = Math.max(0, ((p * (1 + b) - 1) / b) * 100);
-            document.getElementById('optimalBet').textContent = kellyPercentage.toFixed(1);
+            const p = parseFloat(currentProbability);
+            const price = parseFloat(currentPrice);
+            const returns = 1/price - 1; // Correct return calculation
+            const kellyAmount = Math.max(0, bankroll * (p - (1-p)/returns));
+            document.getElementById('optimalBet').textContent = kellyAmount.toFixed(2);
         }
 
         function placeBet() {
-            const price = parseFloat(document.getElementById('marketPrice').value);
-            const probability = parseFloat(document.getElementById('probability').value);
-            const betPercentage = document.getElementById('betAmount').value / 100;
-            const betSize = bankroll * betPercentage;
+            const betSize = parseFloat(document.getElementById('betAmount').value);
+            if (betSize > bankroll) {
+                alert("You can't bet more than your bankroll!");
+                return;
+            }
             
-            // Use the true probability for the outcome
-            const win = Math.random() < probability;
+            const win = Math.random() < currentProbability;
             
             if (win) {
-                bankroll += betSize * (1 - price);
+                bankroll += betSize * (1/currentPrice - 1);
             } else {
                 bankroll -= betSize;
             }
 
             betCount++;
-            
             document.getElementById('currentBankroll').textContent = bankroll.toFixed(2);
             document.getElementById('betCount').textContent = betCount;
+            generateNewBet();
         }
+
+        function skipBet() {
+            generateNewBet();
+        }
+
+        // Initialize first bet
+        generateNewBet();
     </script>
 </body>
 </html> 
