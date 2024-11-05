@@ -4,39 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelly Criterion Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .game-container {
-            margin-top: 20px;
-        }
-        .input-group {
-            margin: 10px 0;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 10px 0;
-        }
-        #results {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="../../index.css">
+    <link rel="stylesheet" href="kelly.css">
 </head>
 <body>
-    <h1>Kelly Criterion Game</h1>
-    <div class="game-container">
-        <div class="input-group">
-            <label for="betAmount">What percentage of your bankroll do you want to bet? (0-100%)</label>
-            <input type="number" id="betAmount" min="0" max="100" value="0">
-        </div>
-        <button onclick="placeBet()">Place Bet</button>
-        <div id="results">
-            <p>Current Bankroll: $<span id="currentBankroll">1000</span></p>
-            <p>Number of Bets: <span id="betCount">0</span></p>
+    <div class="h-center">
+        <h1>Kelly Criterion Game</h1>
+        <div class="kelly-container">
+            <div class="kelly-input">
+                <label for="marketPrice">Market Price (0-1)</label>
+                <input type="number" id="marketPrice" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="kelly-input">
+                <label for="probability">True Probability of Winning (0-1)</label>
+                <input type="number" id="probability" min="0" max="1" step="0.01" value="0.6">
+            </div>
+            <div class="kelly-input">
+                <label for="betAmount">What percentage of your bankroll do you want to bet? (0-100%)</label>
+                <input type="number" id="betAmount" min="0" max="100" value="0">
+            </div>
+            <div class="kelly-input">
+                <p>Optimal Kelly Bet: <span id="optimalBet">0</span>%</p>
+            </div>
+            <button class="kelly-button" onclick="placeBet()">Place Bet</button>
+            <div id="results">
+                <p>Current Bankroll: $<span id="currentBankroll">1000</span></p>
+                <p>Number of Bets: <span id="betCount">0</span></p>
+            </div>
         </div>
     </div>
 
@@ -44,15 +38,26 @@
         let bankroll = 1000;
         let betCount = 0;
 
+        function calculateKelly() {
+            const p = parseFloat(document.getElementById('probability').value);
+            const price = parseFloat(document.getElementById('marketPrice').value);
+            const b = (1 - price) / price; // Convert price to odds
+            const q = 1 - p;
+            const kellyPercentage = Math.max(0, ((p * (1 + b) - 1) / b) * 100);
+            document.getElementById('optimalBet').textContent = kellyPercentage.toFixed(1);
+        }
+
         function placeBet() {
+            const price = parseFloat(document.getElementById('marketPrice').value);
+            const probability = parseFloat(document.getElementById('probability').value);
             const betPercentage = document.getElementById('betAmount').value / 100;
             const betSize = bankroll * betPercentage;
             
-            // 60% chance to win, 40% to lose
-            const win = Math.random() < 0.6;
+            // Use the true probability for the outcome
+            const win = Math.random() < probability;
             
             if (win) {
-                bankroll += betSize;
+                bankroll += betSize * (1 - price);
             } else {
                 bankroll -= betSize;
             }
