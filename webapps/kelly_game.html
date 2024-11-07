@@ -20,6 +20,9 @@
             <div class="kelly-input">
                 <label for="roundsInput">Number of Rounds:</label>
                 <input type="number" id="roundsInput" min="1" value="200">
+                <label for="kellyFraction">Kelly Fraction (α):</label>
+                <input type="range" id="kellyFraction" min="0" max="1" step="0.1" value="0.5">
+                <span id="kellyFractionValue">0.5</span>
                 <button class="kelly-button" onclick="startGame()">Start Game</button>
             </div>
             <div class="kelly-input" id="betControls" style="display: none;">
@@ -47,9 +50,13 @@
         let performanceChart;
         let performanceData = {
             actual: [1000],
-            optimal: [1000]
+            optimal: [1000],
+            fractional: [1000]
         };
         let gameStarted = false;
+        let fractionalKellyBankroll = 1000;
+        let totalWins = 0;
+        let totalBets = 0;
 
         function startGame() {
             if (gameStarted) return;
@@ -86,6 +93,12 @@
                         data: [Math.log10(1000)],
                         borderColor: 'rgb(192, 75, 75)',
                         tension: 0.1
+                    },
+                    {
+                        label: 'Fractional Kelly Portfolio (log10 scale)',
+                        data: [Math.log10(1000)],
+                        borderColor: 'rgb(75, 75, 192)',
+                        tension: 0.1
                     }]
                 },
                 options: {
@@ -106,6 +119,7 @@
             performanceChart.data.labels.push(betCount.toString());
             performanceChart.data.datasets[0].data.push(Math.log10(bankroll));
             performanceChart.data.datasets[1].data.push(Math.log10(optimalBankroll));
+            performanceChart.data.datasets[2].data.push(Math.log10(fractionalKellyBankroll));
             performanceChart.update();
         }
 
@@ -136,16 +150,32 @@
                 return;
             }
             
-            const win = Math.random() < currentProbability;
+            const win = Math.random() < parseFloat(currentProbability);
+            if (win) totalWins++;
+            totalBets++;
+            
+            // Log win rate statistics every bet
+            console.log(`Win Rate Stats:
+            Expected: ${currentProbability}
+            Actual: ${(totalWins/totalBets).toFixed(3)} (${totalWins}/${totalBets} bets)
+            `);
+            
             const kellyBetSize = calculateKelly();
+            const fraction = parseFloat(document.getElementById('kellyFraction').value);
+            const fractionalKellyBetSize = kellyBetSize * fraction;
+            
+            // Debug log to verify win rates (can be removed in production)
+            console.log(`Bet result - Probability: ${currentProbability}, Price: ${currentPrice}, Win: ${win}`);
             
             // Update actual bankroll
             if (win) {
                 bankroll += betSize * (1/currentPrice - 1);
                 optimalBankroll += kellyBetSize * (1/currentPrice - 1);
+                fractionalKellyBankroll += fractionalKellyBetSize * (1/currentPrice - 1);
             } else {
                 bankroll -= betSize;
                 optimalBankroll -= kellyBetSize;
+                fractionalKellyBankroll -= fractionalKellyBetSize;
             }
 
             betCount++;
@@ -175,17 +205,17 @@
         }
 
         function generateNewBet() {
-            // Generate new market price between 0.1 and 0.9
-            currentPrice = (Math.random() * 0.8 + 0.1).toFixed(2);
-            // Generate true probability slightly different from market price
-            currentProbability = (parseFloat(currentPrice) + (Math.random() - 0.5) * 0.2).toFixed(2);
-            
-            // Ensure probability stays between 0 and 1
-            currentProbability = Math.min(Math.max(currentProbability, 0), 1);
+            // Ensure we're using fresh random numbers for each value
+            currentPrice = (Math.random() * 0.8 + 0.1).toFixed(3);
+            currentProbability = (Math.random() * 0.8 + 0.1).toFixed(3);
             
             document.getElementById('marketPrice').textContent = currentPrice;
             document.getElementById('probability').textContent = currentProbability;
         }
+
+        document.getElementById('kellyFraction').addEventListener('input', function() {
+            document.getElementById('kellyFractionValue').textContent = this.value;
+        });
 
         // Initialize game
         initializeChart();
